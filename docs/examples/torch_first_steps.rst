@@ -34,6 +34,8 @@ Generating synthetic sinusoidal training data
     data_y = np.sin(np.linspace(0, 6 * np.pi, N)).reshape([1, N, 1]).astype(np.float32)
     print("data_x.shape: ", str(data_x.shape))
     print("data_y.shape: ", str(data_y.shape))
+    data_x = torch.Tensor(data_x)
+    data_y = torch.Tensor(data_y)
     dataloader = data.DataLoader(
         data.TensorDataset(data_x, data_y), batch_size=1, shuffle=True, num_workers=4
     )
@@ -113,6 +115,8 @@ For the wiring we will use the ```AutoNCP`` class, which creates a NCP wiring di
 
 .. code-block:: python
 
+    in_features = 2
+    out_features = 1
     wiring = AutoNCP(16, out_features)  # 16 units, 1 motor neuron
 
     ltc_model = LTC(in_features, wiring, batch_first=True)
@@ -168,7 +172,7 @@ Training the model
 .. code-block:: python
 
     # Train the model for 400 epochs (= training steps)
-    hist = model.fit(x=data_x, y=data_y, batch_size=1, epochs=400,verbose=1)
+    trainer.fit(learn, dataloader)
 
 
 .. code-block:: text
@@ -176,21 +180,8 @@ Training the model
     .... 1/1 [00:00<00:00, 4.91it/s, loss=0.000459, v_num=0, train_loss=0.000397]
 
 
-Plotting the training loss and the prediction of the model after training
+Plotting the prediction of the model after training
 ------------------------------------------------------------------------------
-.. code-block:: python
-
-    # Let's visualize the training loss
-    sns.set()
-    plt.figure(figsize=(6, 4))
-    plt.plot(hist.history["loss"], label="Training loss")
-    plt.legend(loc="upper right")
-    plt.xlabel("Training steps")
-    plt.show()
-
-
-.. image:: ../img/examples/rnd_train_loss.png
-   :align: center
 
 .. code-block:: python
 
